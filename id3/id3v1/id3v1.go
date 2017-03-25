@@ -181,11 +181,11 @@ func ParseTag(readSeeker io.ReadSeeker) *Tag {
 	}
 
 	return &Tag{
-		title:   string(data[3:33]),
-		artist:  string(data[33:63]),
-		album:   string(data[63:93]),
-		year:    string(data[93:97]),
-		comment: string(data[97:127]),
+		title:   bytesToString(data[3:33]),
+		artist:  bytesToString(data[33:63]),
+		album:   bytesToString(data[63:93]),
+		year:    bytesToString(data[93:97]),
+		comment: bytesToString(data[97:127]),
 		genre:   data[127],
 		dirty:   false,
 	}

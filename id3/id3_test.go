@@ -27,7 +27,7 @@ func TestOpen(t *testing.T) {
 	}
 
 	if s := tag.Artist(); s != "Nathan" {
-		t.Errorf("Open: Incorrect artist, %v", s)
+		t.Errorf("Open: Incorrect artist, %v", []byte(s))
 	}
 
 	if s := tag.Title(); s != "A Good Song" {
