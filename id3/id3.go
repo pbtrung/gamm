@@ -5,6 +5,7 @@
 package id3
 
 import (
+	"errors"
 	"os"
 
 	"github.com/pbtrung/gamm/id3/id3v1"
@@ -32,6 +33,7 @@ type Tagger interface {
 
 // File represents the tagged file
 type File struct {
+	Tagger
 	originalSize int
 	file         *os.File
 }
@@ -46,10 +48,31 @@ func Open(name string) (*File, error) {
 	file := &File{file: fi}
 	if id3v1Tag := id3v1.ParseTag(fi); id3v1Tag != nil {
 		file.Tagger = id3v1Tag
-	} else {
-		// Add a new tag if none exists
-		file.Tagger = v2.NewTag(LatestVersion)
 	}
 
 	return file, nil
+}
+
+// Saves any edits to the tagged file
+func (f *File) Close() error {
+	defer f.file.Close()
+
+	if !f.Dirty() {
+		return nil
+	}
+
+	switch f.Tagger.(type) {
+	case (*id3v1.Tag):
+		if _, err := f.file.Seek(-id3v1.TagSize, os.SEEK_END); err != nil {
+			return err
+		}
+	default:
+		return errors.New("Close: Unknown tag version")
+	}
+
+	if _, err := f.file.Write(f.Tagger.Bytes()); err != nil {
+		return err
+	}
+
+	return nil
 }
