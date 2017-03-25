@@ -1,1 +1,1 @@
-# Go Audio Metadata Manipulator
+# Go Audio Metadata Manipulator (GAMM)
