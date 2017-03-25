@@ -1,11 +1,12 @@
-// Copyright 2017 Trung Pham. All rights reserved.		t.Errorf("Open: Incorrect artist, %b", []byte("Nathan"))
-
+// Copyright 2017 Trung Pham. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package id3
 
 import (
+	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/pbtrung/gamm/id3/id3v1"
@@ -27,7 +28,7 @@ func TestOpen(t *testing.T) {
 	}
 
 	if s := tag.Artist(); s != "Nathan" {
-		t.Errorf("Open: Incorrect artist, %v", []byte(s))
+		t.Errorf("Open: Incorrect artist, %s", s)
 	}
 
 	if s := tag.Title(); s != "A Good Song" {
@@ -36,5 +37,40 @@ func TestOpen(t *testing.T) {
 
 	if s := tag.Album(); s != "Life" {
 		t.Errorf("Open: Incorrect album, %v", s)
+	}
+}
+
+func TestClose(t *testing.T) {
+	before, err := ioutil.ReadFile(testFile)
+	if err != nil {
+		t.Errorf("Test file error")
+	}
+
+	file, err := Open(testFile)
+	if err != nil {
+		t.Errorf("Close: Unable to open file")
+	}
+	beforeCutoff := file.originalSize
+
+	file.SetArtist("Kim")
+	file.SetTitle("A Test Song")
+
+	afterCutoff := file.Size()
+
+	if err := file.Close(); err != nil {
+		t.Errorf("Close: Unable to close file")
+	}
+
+	after, err := ioutil.ReadFile(testFile)
+	if err != nil {
+		t.Errorf("Close: Unable to reopen file")
+	}
+
+	if !bytes.Equal(before[beforeCutoff:], after[afterCutoff:]) {
+		t.Errorf("Close: Lose nontag data on close")
+	}
+
+	if err := ioutil.WriteFile(testFile, before, 0666); err != nil {
+		t.Errorf("Close: Unable to write original contents to test file")
 	}
 }
