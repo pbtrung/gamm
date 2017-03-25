@@ -191,10 +191,7 @@ func ParseTag(readSeeker io.ReadSeeker) *Tag {
 	}
 }
 
-func (t Tag) Dirty() bool {
-	return t.dirty
-}
-
+func (t Tag) Dirty() bool    { return t.dirty }
 func (t Tag) Title() string  { return t.title }
 func (t Tag) Artist() string { return t.artist }
 func (t Tag) Album() string  { return t.album }
@@ -208,7 +205,9 @@ func (t Tag) Genre() string {
 	return ""
 }
 
-func (t Tag) Comment() string { return t.comment }
+func (t Tag) Comments() []string {
+	return []string{t.comment}
+}
 
 func (t *Tag) SetTitle(text string) {
 	t.title = text
@@ -262,3 +261,6 @@ func (t Tag) Size() int {
 func (t Tag) Version() string {
 	return "1.0"
 }
+
+// Dummy methods to satisfy Tagger interface
+func (t Tag) Padding() uint { return 0 }
